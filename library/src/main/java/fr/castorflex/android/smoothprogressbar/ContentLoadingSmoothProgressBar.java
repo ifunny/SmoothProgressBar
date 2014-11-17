@@ -69,8 +69,18 @@ public class ContentLoadingSmoothProgressBar extends SmoothProgressBar {
 	}
 
 	private void removeCallbacks() {
-		removeCallbacks(mDelayedHide);
+		removeHideCallback();
+		removeShowCallback();
+	}
+
+	private void removeShowCallback() {
+		mPostedShow = false;
 		removeCallbacks(mDelayedShow);
+	}
+
+	private void removeHideCallback() {
+		mPostedHide = false;
+		removeCallbacks(mDelayedHide);
 	}
 
 	/**
@@ -80,7 +90,7 @@ public class ContentLoadingSmoothProgressBar extends SmoothProgressBar {
 	 */
 	public void hide() {
 		mDismissed = true;
-		removeCallbacks(mDelayedShow);
+		removeShowCallback();
 		long diff = System.currentTimeMillis() - mStartTime;
 		if (diff >= mShowTime || mStartTime == -1) {
 			// The progress spinner has been shown long enough
@@ -106,7 +116,7 @@ public class ContentLoadingSmoothProgressBar extends SmoothProgressBar {
 		// Reset the start time.
 		mStartTime = -1;
 		mDismissed = false;
-		removeCallbacks(mDelayedHide);
+		removeHideCallback();
 		if (!mPostedShow) {
 			postDelayed(mDelayedShow, startDelay);
 			mPostedShow = true;
