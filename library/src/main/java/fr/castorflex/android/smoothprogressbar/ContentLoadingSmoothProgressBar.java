@@ -44,6 +44,7 @@ public class ContentLoadingSmoothProgressBar extends SmoothProgressBar {
 		}
 	};
 
+
 	public ContentLoadingSmoothProgressBar(Context context) {
 		this(context, null);
 	}
@@ -125,5 +126,9 @@ public class ContentLoadingSmoothProgressBar extends SmoothProgressBar {
 
 	public void show() {
 		show(DEFAULT_DELAY);
+	}
+
+	public void showProgressive(int startDelay) {
+
 	}
 }
