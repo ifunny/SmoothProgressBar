@@ -6,6 +6,7 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
@@ -22,6 +23,8 @@ public class SmoothProgressBar extends ProgressBar {
 	private static final int INTERPOLATOR_LINEAR = 1;
 	private static final int INTERPOLATOR_ACCELERATEDECELERATE = 2;
 	private static final int INTERPOLATOR_DECELERATE = 3;
+
+	private boolean progressiveShowEnabled;
 
 	public SmoothProgressBar(Context context) {
 		this(context, null);
@@ -57,6 +60,8 @@ public class SmoothProgressBar extends ProgressBar {
 		final Drawable backgroundDrawable = a.getDrawable(R.styleable.SmoothProgressBar_spb_background);
 		final boolean generateBackgroundWithColors = a.getBoolean(R.styleable.SmoothProgressBar_spb_generate_background_with_colors, false);
 		final boolean gradients = a.getBoolean(R.styleable.SmoothProgressBar_spb_gradients, false);
+		progressiveShowEnabled = a.getBoolean(R.styleable.SmoothProgressBar_spb_progressive_show,
+				res.getBoolean(R.bool.spb_default_progressive_show));
 		a.recycle();
 
 		//interpolator
@@ -186,7 +191,23 @@ public class SmoothProgressBar extends ProgressBar {
 				setInterpolator(interpolator);
 			}
 		}
+		if (a.hasValue(R.styleable.SmoothProgressBar_spb_progressive_show)) {
+			progressiveShowEnabled = a.getBoolean(R.styleable.SmoothProgressBar_spb_progressive_show, false);
+		}
 		a.recycle();
+	}
+
+	@Override
+	public void setIndeterminateDrawable(Drawable d) {
+		Drawable oldDrawable = getIndeterminateDrawable();
+		if (oldDrawable != null) {
+			if (oldDrawable instanceof SmoothProgressDrawable) {
+				SmoothProgressDrawable oldSmoothProgressDrawable = (SmoothProgressDrawable) oldDrawable;
+				oldSmoothProgressDrawable.setCallbacks(null);
+			}
+		}
+		super.setIndeterminateDrawable(d);
+
 	}
 
 	@Override
@@ -212,6 +233,7 @@ public class SmoothProgressBar extends ProgressBar {
 		if (ret != null && (ret instanceof SmoothProgressDrawable))
 			((SmoothProgressDrawable) ret).setInterpolator(interpolator);
 	}
+
 
 	public void setSmoothProgressDrawableInterpolator(Interpolator interpolator) {
 		checkIndeterminateDrawable().setInterpolator(interpolator);
@@ -269,11 +291,45 @@ public class SmoothProgressBar extends ProgressBar {
 		checkIndeterminateDrawable().setUseGradients(useGradients);
 	}
 
-	public void progressiveStart() {
+	private void progressiveStart() {
 		checkIndeterminateDrawable().progressiveStart();
 	}
 
-	public void progressiveStop() {
+	private void progressiveStop() {
 		checkIndeterminateDrawable().progressiveStop();
+	}
+
+	public void show() {
+		if (progressiveShowEnabled) {
+			SmoothProgressDrawable drawable = checkIndeterminateDrawable();
+			if (drawable != null) {
+				drawable.setCallbacks(new SmoothProgressDrawable.Callbacks() {
+					@Override
+					public void onStop() {
+						setVisibility(View.GONE);
+						SmoothProgressDrawable drawable = checkIndeterminateDrawable();
+						drawable.setCallbacks(null);
+					}
+
+					@Override
+					public void onStart() {
+						setVisibility(View.VISIBLE);
+					}
+				});
+			}
+			progressiveStart();
+		} else {
+			setVisibility(View.VISIBLE);
+		}
+	}
+
+	public void hide() {
+		if (progressiveShowEnabled) {
+			progressiveStop();
+		} else {
+			SmoothProgressDrawable drawable = checkIndeterminateDrawable();
+			drawable.setCallbacks(null);
+			setVisibility(View.GONE);
+		}
 	}
 }
