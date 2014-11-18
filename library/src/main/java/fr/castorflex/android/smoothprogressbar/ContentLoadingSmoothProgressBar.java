@@ -1,6 +1,7 @@
 package fr.castorflex.android.smoothprogressbar;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.util.AttributeSet;
 
 /**
@@ -9,10 +10,10 @@ import android.util.AttributeSet;
  */
 public class ContentLoadingSmoothProgressBar extends SmoothProgressBar {
 
-	private static final int DEFAULT_SHOW_TIME = 500; // ms
-	private static final int DEFAULT_DELAY = 500; // ms
+	private static final int DEFAULT_SHOW_TIME = 1500; // ms
+	private static final int DEFAULT_DELAY = 300; // ms
 
-	private long mShowTime = DEFAULT_SHOW_TIME;
+	private long mShowTime;
 	private long mStartTime = -1;
 
 	private boolean mPostedHide = false;
@@ -50,10 +51,16 @@ public class ContentLoadingSmoothProgressBar extends SmoothProgressBar {
 
 	public ContentLoadingSmoothProgressBar(Context context, AttributeSet attrs) {
 		super(context, attrs, 0);
+		if (attrs != null) {
+			TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ContentLoadingSmoothProgressBar);
+			mShowTime = a.getInteger(R.styleable.ContentLoadingSmoothProgressBar_clspb_min_show_time,
+					DEFAULT_SHOW_TIME);
+			a.recycle();
+		}
 	}
 
-	public void setShowTime(long ShowTime) {
-		this.mShowTime = ShowTime;
+	public void setShowTime(long showTime) {
+		this.mShowTime = showTime;
 	}
 
 	@Override
@@ -129,4 +136,9 @@ public class ContentLoadingSmoothProgressBar extends SmoothProgressBar {
 		show(DEFAULT_DELAY);
 	}
 
+	@Override
+	public void instantHide() {
+		super.instantHide();
+		removeCallbacks();
+	}
 }
