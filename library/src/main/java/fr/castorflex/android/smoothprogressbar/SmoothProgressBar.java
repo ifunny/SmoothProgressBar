@@ -332,4 +332,10 @@ public class SmoothProgressBar extends ProgressBar {
 			setVisibility(View.GONE);
 		}
 	}
+
+	public void instantHide() {
+		SmoothProgressDrawable drawable = checkIndeterminateDrawable();
+		drawable.setCallbacks(null);
+		setVisibility(View.GONE);
+	}
 }
