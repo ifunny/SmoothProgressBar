@@ -25,5 +25,6 @@
 	</declare-styleable>
 	<declare-styleable name="ContentLoadingSmoothProgressBar">
 		<attr name="clspb_min_show_time" format="integer"/>
+		<attr name="clspb_min_show_delay" format="integer"/>
 	</declare-styleable>
 </resources>

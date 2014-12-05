@@ -11,9 +11,10 @@ import android.util.AttributeSet;
 public class ContentLoadingSmoothProgressBar extends SmoothProgressBar {
 
 	private static final int DEFAULT_SHOW_TIME = 1500; // ms
-	private static final int DEFAULT_DELAY = 300; // ms
+	private static final int DEFAULT_SHOW_DELAY = 300; // ms
 
-	private long mShowTime;
+	private int mShowDelay = DEFAULT_SHOW_DELAY;
+	private long mShowTime = DEFAULT_SHOW_TIME;
 	private long mStartTime = -1;
 
 	private boolean mPostedHide = false;
@@ -55,6 +56,8 @@ public class ContentLoadingSmoothProgressBar extends SmoothProgressBar {
 			TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ContentLoadingSmoothProgressBar);
 			mShowTime = a.getInteger(R.styleable.ContentLoadingSmoothProgressBar_clspb_min_show_time,
 					DEFAULT_SHOW_TIME);
+			mShowDelay = a.getInteger(R.styleable.ContentLoadingSmoothProgressBar_clspb_min_show_delay,
+					DEFAULT_SHOW_DELAY);
 			a.recycle();
 		}
 	}
@@ -133,7 +136,7 @@ public class ContentLoadingSmoothProgressBar extends SmoothProgressBar {
 
 	@Override
 	public void show() {
-		show(DEFAULT_DELAY);
+		show(mShowDelay);
 	}
 
 	@Override
