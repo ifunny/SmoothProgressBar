@@ -129,8 +129,13 @@ public class ContentLoadingSmoothProgressBar extends SmoothProgressBar {
 		mDismissed = false;
 		removeHideCallback();
 		if (!mPostedShow) {
-			postDelayed(mDelayedShow, startDelay);
-			mPostedShow = true;
+			if (startDelay == 0) {
+				mDelayedShow.run();
+			} else {
+				postDelayed(mDelayedShow, startDelay);
+				mPostedShow = true;
+			}
+
 		}
 	}
 
