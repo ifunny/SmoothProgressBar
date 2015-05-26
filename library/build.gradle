@@ -1,9 +1,5 @@
 apply plugin: 'com.android.library'
 
-repositories {
-	mavenCentral()
-}
-
 android {
 	compileSdkVersion rootProject.ext.compileSdkVersion
 	buildToolsVersion rootProject.ext.buildToolsVersion
@@ -16,8 +12,13 @@ android {
 	defaultConfig {
 		minSdkVersion 14
 		targetSdkVersion rootProject.ext.compileSdkVersion
+		versionName project.VERSION_NAME
+		versionCode Integer.parseInt(project.VERSION_CODE)
 	}
+}
 
+repositories {
+	mavenCentral()
 }
 
 //apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'

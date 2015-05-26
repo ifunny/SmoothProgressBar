@@ -5,6 +5,7 @@ import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
@@ -21,6 +22,7 @@ import static fr.castorflex.android.circularprogressbar.CircularProgressBarUtils
 import static fr.castorflex.android.circularprogressbar.CircularProgressBarUtils.checkNotNull;
 import static fr.castorflex.android.circularprogressbar.CircularProgressBarUtils.checkPositiveOrZero;
 import static fr.castorflex.android.circularprogressbar.CircularProgressBarUtils.checkSpeed;
+import static fr.castorflex.android.circularprogressbar.CircularProgressBarUtils.getAnimatedFraction;
 
 public class CircularProgressDrawable extends Drawable
     implements Animatable {
@@ -99,13 +101,12 @@ public class CircularProgressDrawable extends Drawable
 
   private void reinitValues() {
     mFirstSweepAnimation = true;
+    mCurrentEndRatio = 1f;
     mPaint.setColor(mCurrentColor);
   }
 
   @Override
   public void draw(Canvas canvas) {
-    if (!isRunning()) return;
-
     float startAngle = mCurrentRotationAngle - mCurrentRotationAngleOffset;
     float sweepAngle = mCurrentSweepAngle;
     if (!mModeAppearing) {
@@ -164,7 +165,7 @@ public class CircularProgressDrawable extends Drawable
     mRotationAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
       @Override
       public void onAnimationUpdate(ValueAnimator animation) {
-        float angle = animation.getAnimatedFraction() * 360f;
+        float angle = getAnimatedFraction(animation) * 360f;
         setCurrentRotationAngle(angle);
       }
     });
@@ -177,7 +178,7 @@ public class CircularProgressDrawable extends Drawable
     mSweepAppearingAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
       @Override
       public void onAnimationUpdate(ValueAnimator animation) {
-        float animatedFraction = animation.getAnimatedFraction();
+        float animatedFraction = getAnimatedFraction(animation);
         float angle;
         if (mFirstSweepAnimation) {
           angle = animatedFraction * mMaxSweepAngle;
@@ -221,7 +222,7 @@ public class CircularProgressDrawable extends Drawable
     mSweepDisappearingAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
       @Override
       public void onAnimationUpdate(ValueAnimator animation) {
-        float animatedFraction = animation.getAnimatedFraction();
+        float animatedFraction = getAnimatedFraction(animation);
         setCurrentSweepAngle(mMaxSweepAngle - animatedFraction * (mMaxSweepAngle - mMinSweepAngle));
 
         long duration = animation.getDuration();
@@ -269,7 +270,8 @@ public class CircularProgressDrawable extends Drawable
     mEndAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
       @Override
       public void onAnimationUpdate(ValueAnimator animation) {
-        setEndRatio(1f - animation.getAnimatedFraction());
+        setEndRatio(1f - getAnimatedFraction(animation));
+
       }
     });
     mEndAnimator.addListener(new Animator.AnimatorListener() {
@@ -282,7 +284,7 @@ public class CircularProgressDrawable extends Drawable
 
       @Override
       public void onAnimationEnd(Animator animation) {
-        setEndRatio(1f);
+        setEndRatio(0f);
         if (!cancelled) stop();
       }
 
@@ -393,16 +395,26 @@ public class CircularProgressDrawable extends Drawable
     private Interpolator mAngleInterpolator = DEFAULT_ROTATION_INTERPOLATOR;
 
     public Builder(Context context) {
-      initValues(context);
+      this(context, false);
     }
 
-    private void initValues(Context context) {
+    public Builder(Context context, boolean editMode) {
+      initValues(context, editMode);
+    }
+
+    private void initValues(Context context, boolean editMode) {
       mStrokeWidth = context.getResources().getDimension(R.dimen.cpb_default_stroke_width);
       mSweepSpeed = 1f;
       mRotationSpeed = 1f;
-      mColors = new int[]{context.getResources().getColor(R.color.cpb_default_color)};
-      mMinSweepAngle = context.getResources().getInteger(R.integer.cpb_default_min_sweep_angle);
-      mMaxSweepAngle = context.getResources().getInteger(R.integer.cpb_default_max_sweep_angle);
+      if (editMode) {
+        mColors = new int[]{Color.BLUE};
+        mMinSweepAngle = 20;
+        mMaxSweepAngle = 300;
+      } else {
+        mColors = new int[]{context.getResources().getColor(R.color.cpb_default_color)};
+        mMinSweepAngle = context.getResources().getInteger(R.integer.cpb_default_min_sweep_angle);
+        mMaxSweepAngle = context.getResources().getInteger(R.integer.cpb_default_max_sweep_angle);
+      }
       mStyle = Style.ROUNDED;
     }
 
