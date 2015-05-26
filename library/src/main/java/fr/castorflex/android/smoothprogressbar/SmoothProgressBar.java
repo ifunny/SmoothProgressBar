@@ -54,6 +54,7 @@ public class SmoothProgressBar extends ProgressBar {
 		final float speedProgressiveStart = a.getFloat(R.styleable.SmoothProgressBar_spb_progressiveStart_speed, speed);
 		final float speedProgressiveStop = a.getFloat(R.styleable.SmoothProgressBar_spb_progressiveStop_speed, speed);
 		final int iInterpolator = a.getInteger(R.styleable.SmoothProgressBar_spb_interpolator, -1);
+		final float interpolatorFactor = a.getFloat(R.styleable.SmoothProgressBar_spb_interpolator_factor, Float.parseFloat(res.getString(R.string.spb_default_interpolator_factor)));
 		final boolean reversed = a.getBoolean(R.styleable.SmoothProgressBar_spb_reversed, res.getBoolean(R.bool.spb_default_reversed));
 		final boolean mirrorMode = a.getBoolean(R.styleable.SmoothProgressBar_spb_mirror_mode, res.getBoolean(R.bool.spb_default_mirror_mode));
 		final int colorsId = a.getResourceId(R.styleable.SmoothProgressBar_spb_colors, 0);
@@ -75,14 +76,14 @@ public class SmoothProgressBar extends ProgressBar {
 					interpolator = new AccelerateDecelerateInterpolator();
 					break;
 				case INTERPOLATOR_DECELERATE:
-					interpolator = new DecelerateInterpolator();
+					interpolator = new DecelerateInterpolator(interpolatorFactor);
 					break;
 				case INTERPOLATOR_LINEAR:
 					interpolator = new LinearInterpolator();
 					break;
 				case INTERPOLATOR_ACCELERATE:
 				default:
-					interpolator = new AccelerateInterpolator();
+					interpolator = new AccelerateInterpolator(interpolatorFactor);
 			}
 		}
 
@@ -147,6 +148,10 @@ public class SmoothProgressBar extends ProgressBar {
 		if (a.hasValue(R.styleable.SmoothProgressBar_spb_speed)) {
 			setSmoothProgressDrawableSpeed(a.getFloat(R.styleable.SmoothProgressBar_spb_speed, 0));
 		}
+		float interpolatorFactor = 1;
+		if (a.hasValue(R.styleable.SmoothProgressBar_spb_interpolator_factor)) {
+			interpolatorFactor = a.getFloat(R.styleable.SmoothProgressBar_spb_interpolator_factor, 1);
+		}
 		if (a.hasValue(R.styleable.SmoothProgressBar_spb_progressiveStart_speed)) {
 			setSmoothProgressDrawableProgressiveStartSpeed(a.getFloat(R.styleable.SmoothProgressBar_spb_progressiveStart_speed, 0));
 		}
@@ -176,13 +181,13 @@ public class SmoothProgressBar extends ProgressBar {
 					interpolator = new AccelerateDecelerateInterpolator();
 					break;
 				case INTERPOLATOR_DECELERATE:
-					interpolator = new DecelerateInterpolator();
+					interpolator = new DecelerateInterpolator(interpolatorFactor);
 					break;
 				case INTERPOLATOR_LINEAR:
 					interpolator = new LinearInterpolator();
 					break;
 				case INTERPOLATOR_ACCELERATE:
-					interpolator = new AccelerateInterpolator();
+					interpolator = new AccelerateInterpolator(interpolatorFactor);
 					break;
 				default:
 					interpolator = null;
