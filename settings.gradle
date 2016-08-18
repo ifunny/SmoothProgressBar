@@ -1,3 +1,5 @@
 include ':sample'
-include ':library'
-include ':library-circular'
+include ':SmoothProgressBar'
+project(':SmoothProgressBar').projectDir = new File('library')
+include ':SmoothProgressBar-circular'
+project(':SmoothProgressBar-circular').projectDir = new File('library-circular')
